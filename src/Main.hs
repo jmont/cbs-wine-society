@@ -4,6 +4,16 @@
 module Main (main) where
 
 import Data.List.Split
+import System.Random
+
+-- Shuffle
+
+shuffle :: [a] -> IO [a]
+shuffle [] = return []
+shuffle xs = do
+    randomPosition <- getStdRandom (randomR (0, length xs - 1))
+    let (left, (a:right)) = splitAt randomPosition xs
+     in fmap (a:) (shuffle (left ++ right))
 
 -- Member
 
@@ -36,8 +46,9 @@ main = do
     let (header:rows) = lines sampleCSVFile
     let members = map mkMember rows
     let (going, notGoing) = sieveByAttendance members
+    shuffled <- shuffle going
     putStrLn "~~ Going ~~"
-    putStrLn $ unlines $ map show going
+    putStrLn $ unlines $ map show shuffled
     putStrLn "~~ Not Going ~~"
     putStrLn $ unlines $ map show notGoing
     return ()
