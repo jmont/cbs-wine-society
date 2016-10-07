@@ -19,7 +19,7 @@ data Member = Member {
 
 mkMember :: String -> Member
 mkMember row =
-    let [date, last, first, email, status] = splitOn "," row
+    let [date, last, first, email, status] = splitOn "," $ init row -- have weird tabs at end of line
         attending = if status == "Attending" then Going else NotGoing
      in Member date last first email attending
 
