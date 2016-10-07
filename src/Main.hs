@@ -5,7 +5,7 @@ module Main (main) where
 
 import Data.List.Split
 
--- Date,Last Name,First Name,Email Address,Status
+-- Member
 
 data AttendanceStatus = Going | NotGoing deriving (Show)
 
@@ -15,13 +15,18 @@ data Member = Member {
     firstName :: String,
     email :: String,
     status :: AttendanceStatus
-} deriving (Show)
+}
 
 mkMember :: String -> Member
 mkMember row =
     let [date, last, first, email, status] = splitOn "," row
         attending = if status == "Attending" then Going else NotGoing
      in Member date last first email attending
+
+instance Show Member where
+    show m = firstName m ++ " " ++ lastName m ++ " (" ++ email m ++ ") - " ++ show (status m)
+
+-- Main
 
 main = do
     sampleCSVFile <- readFile "src/data/orgSyncSample.csv"
