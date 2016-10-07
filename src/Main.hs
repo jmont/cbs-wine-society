@@ -27,6 +27,8 @@ data Member = Member {
     status :: AttendanceStatus
 }
 
+kEventMax = 40
+
 mkMember :: String -> Member
 mkMember row =
     let [date, last, first, email, status] = splitOn "," $ init row -- have weird tabs at end of line
@@ -39,6 +41,9 @@ instance Show Member where
 sieveByAttendance :: [Member] -> ([Member], [Member])
 sieveByAttendance = foldr (\m (going, notGoing) -> if status m == Going then (m:going, notGoing) else (going, m:notGoing)) ([], [])
 
+takeDrop :: Int -> [a] -> ([a], [a])
+takeDrop n xs = (take n xs, drop n xs)
+
 -- Main
 
 main = do
@@ -47,8 +52,11 @@ main = do
     let members = map mkMember rows
     let (going, notGoing) = sieveByAttendance members
     shuffled <- shuffle going
+    let (chosen, waitlist) = takeDrop kEventMax shuffled
     putStrLn "~~ Going ~~"
-    putStrLn $ unlines $ map show shuffled
+    putStrLn $ unlines $ map show chosen
+    putStrLn "~~ Waitlist ~~"
+    putStrLn $ unlines $ map show waitlist
     putStrLn "~~ Not Going ~~"
     putStrLn $ unlines $ map show notGoing
     return ()
