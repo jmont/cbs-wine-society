@@ -7,7 +7,7 @@ import Data.List.Split
 
 -- Member
 
-data AttendanceStatus = Going | NotGoing deriving (Show)
+data AttendanceStatus = Going | NotGoing deriving (Show, Eq, Ord)
 
 data Member = Member {
     date :: String,
@@ -26,11 +26,18 @@ mkMember row =
 instance Show Member where
     show m = firstName m ++ " " ++ lastName m ++ " (" ++ email m ++ ") - " ++ show (status m)
 
+sieveByAttendance :: [Member] -> ([Member], [Member])
+sieveByAttendance = foldr (\m (going, notGoing) -> if status m == Going then (m:going, notGoing) else (going, m:notGoing)) ([], [])
+
 -- Main
 
 main = do
     sampleCSVFile <- readFile "src/data/orgSyncSample.csv"
     let (header:rows) = lines sampleCSVFile
     let members = map mkMember rows
-    putStrLn $ unlines $ map show members
+    let (going, notGoing) = sieveByAttendance members
+    putStrLn "~~ Going ~~"
+    putStrLn $ unlines $ map show going
+    putStrLn "~~ Not Going ~~"
+    putStrLn $ unlines $ map show notGoing
     return ()
